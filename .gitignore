@@ -1,0 +1,25 @@
+# Ignore local agent/assistant skill folders
+.claude/
+.agents/
+
+# Editor/IDE
+.vscode/
+*.code-workspace
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node/npm artifacts at workspace root (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
