@@ -370,12 +370,12 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
   return (
     <div className="space-y-6">
       {/* Step indicator */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 overflow-x-auto pb-2 -mb-2 scrollbar-hide">
         {STEPS.map((step, i) => (
-          <div key={i} className="flex items-center">
+          <div key={i} className="flex items-center shrink-0">
             <button
               onClick={() => setCurrentStep(i)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors ${
                 i === currentStep
                   ? "bg-amber-100 text-amber-800"
                   : i < currentStep
@@ -383,7 +383,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
                   : "text-slate-400"
               }`}
             >
-              <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold ${
+              <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold shrink-0 ${
                 i === currentStep
                   ? "bg-amber-500 text-white"
                   : i < currentStep
@@ -392,23 +392,23 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
               }`}>
                 {i < currentStep ? <Check className="w-3.5 h-3.5" /> : i + 1}
               </span>
-              <span className="hidden sm:inline">{step}</span>
+              <span className="hidden sm:inline whitespace-nowrap">{step}</span>
             </button>
             {i < STEPS.length - 1 && (
-              <div className={`w-6 h-px ${i < currentStep ? "bg-green-300" : "bg-slate-200"}`} />
+              <div className={`w-4 sm:w-6 h-px shrink-0 ${i < currentStep ? "bg-green-300" : "bg-slate-200"}`} />
             )}
           </div>
         ))}
       </div>
 
       {/* Step content */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-3 sm:p-4 md:p-6">
         {/* Step 0: Basic Info */}
         {currentStep === 0 && (
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-slate-800 mb-4">Basic Information</h2>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Product Name *</label>
                 <input
@@ -453,7 +453,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Category *</label>
                 <select
@@ -483,7 +483,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Gender</label>
                 <select
@@ -603,7 +603,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
                             <X className="w-4 h-4" />
                           </button>
                         </div>
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           <div>
                             <label className="block text-xs text-slate-500 mb-1">Metal</label>
                             <select
@@ -657,7 +657,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
                             />
                           </div>
                         </div>
-                        <div className="grid grid-cols-4 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                           <div>
                             <label className="block text-xs text-slate-500 mb-1">Part</label>
                             <input
@@ -737,7 +737,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
                             <X className="w-4 h-4" />
                           </button>
                         </div>
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           <div>
                             <label className="block text-xs text-slate-500 mb-1">Gemstone</label>
                             <select
@@ -787,7 +787,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
                             />
                           </div>
                         </div>
-                        <div className="grid grid-cols-4 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                           <div>
                             <label className="block text-xs text-slate-500 mb-1">Total Carat</label>
                             <input
@@ -880,7 +880,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
             {/* Pricing */}
             <div className="border-t border-slate-100 pt-4">
               <h3 className="text-sm font-semibold text-slate-700 mb-3">Pricing</h3>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs text-slate-500 mb-1">GST %</label>
                   <input
@@ -951,7 +951,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
 
             <div className="border-t border-slate-100 pt-4">
               <label className="block text-sm font-medium text-slate-700 mb-2">Video (optional)</label>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <input
                     type="text"
@@ -1028,7 +1028,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Certification</label>
                 <input
@@ -1050,7 +1050,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Delivery Days</label>
                 <input
@@ -1123,7 +1123,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-slate-800 mb-4">Review & Publish</h2>
 
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               {/* Left column */}
               <div className="space-y-4">
                 <div className="p-4 bg-slate-50 rounded-xl">

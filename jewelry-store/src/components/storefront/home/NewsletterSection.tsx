@@ -23,25 +23,24 @@ export function NewsletterSection() {
       {/* ── Decorative ── */}
       <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-gold-500/20 to-transparent" />
 
-      {/* Large floating circles */}
+      {/* Large floating circles — desktop only */}
       <motion.div
         animate={{ scale: [1, 1.15, 1], opacity: [0.03, 0.06, 0.03] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -top-40 -right-40 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] border border-gold-500/10 rounded-full"
+        className="absolute -top-40 -right-40 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] border border-gold-500/10 rounded-full hidden lg:block"
       />
       <motion.div
         animate={{ scale: [1.1, 1, 1.1], opacity: [0.02, 0.05, 0.02] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        className="absolute -bottom-32 -left-32 w-[250px] sm:w-[400px] h-[250px] sm:h-[400px] border border-gold-400/10 rounded-full"
+        className="absolute -bottom-32 -left-32 w-[250px] sm:w-[400px] h-[250px] sm:h-[400px] border border-gold-400/10 rounded-full hidden lg:block"
       />
 
-      {/* Sparkle particles */}
+      {/* Sparkle particles — desktop only */}
+      <div className="hidden lg:block">
       {[
         { top: "15%", left: "10%", delay: 0 },
         { top: "30%", right: "15%", delay: 1.5 },
         { bottom: "20%", left: "25%", delay: 3 },
-        { top: "50%", right: "30%", delay: 2 },
-        { bottom: "35%", right: "10%", delay: 4 },
       ].map((pos, i) => (
         <motion.div
           key={i}
@@ -62,6 +61,7 @@ export function NewsletterSection() {
           <Sparkles className="w-3 h-3 text-gold-400/30" />
         </motion.div>
       ))}
+      </div>
 
       <div className="grain-overlay absolute inset-0" />
 

@@ -158,18 +158,16 @@ export default function Footer() {
             {/* Social Links */}
             <div className="flex items-center gap-2.5 sm:gap-3 mt-5 sm:mt-6">
               {socials.map(({ Icon, href, label }) => (
-                <motion.a
+                <a
                   key={label}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  whileHover={{ scale: 1.1, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="w-9 h-9 rounded-full bg-obsidian-800/50 flex items-center justify-center text-obsidian-400 hover:bg-gold-500/20 hover:text-gold-400 transition-colors duration-300 touch-manipulation"
+                  className="w-10 h-10 rounded-full bg-obsidian-800/50 flex items-center justify-center text-obsidian-400 hover:bg-gold-500/20 hover:text-gold-400 active:scale-95 transition-all duration-300 touch-manipulation"
                 >
                   <Icon className="w-4 h-4" />
-                </motion.a>
+                </a>
               ))}
             </div>
           </motion.div>
@@ -185,12 +183,12 @@ export default function Footer() {
               <h4 className="text-[10px] tracking-[0.2em] uppercase font-semibold text-obsidian-200 mb-3 sm:mb-4">
                 {title}
               </h4>
-              <ul className="space-y-2 sm:space-y-2.5">
+              <ul className="space-y-1 sm:space-y-2.5">
                 {links.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-xs sm:text-sm text-obsidian-400 hover:text-gold-400 transition-colors inline-flex items-center gap-1 group/link"
+                      className="text-xs sm:text-sm text-obsidian-400 hover:text-gold-400 transition-colors inline-flex items-center gap-1 group/link py-1 touch-manipulation"
                     >
                       {link.label}
                       <ArrowUpRight className="w-0 h-3 opacity-0 group-hover/link:w-3 group-hover/link:opacity-100 transition-all duration-200 text-gold-400" />
@@ -258,9 +256,9 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* ── Ambient glow ── */}
-      <div className="absolute -bottom-32 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-gold-500/[0.03] rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-48 right-1/3 w-48 sm:w-64 h-48 sm:h-64 bg-gold-400/[0.02] rounded-full blur-3xl pointer-events-none" />
+      {/* ── Ambient glow — hidden on mobile for perf ── */}
+      <div className="absolute -bottom-32 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-gold-500/3 rounded-full blur-3xl pointer-events-none hidden sm:block" />
+      <div className="absolute -bottom-48 right-1/3 w-48 sm:w-64 h-48 sm:h-64 bg-gold-400/2 rounded-full blur-3xl pointer-events-none hidden sm:block" />
     </footer>
   );
 }

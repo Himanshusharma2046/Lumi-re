@@ -569,3 +569,55 @@ body {
   .animate-pulse-glow, .animate-marquee,
   .animate-float, .animate-float-slow { animation: none !important; }
 }
+
+/* ══════════════════════════════════════
+   MOBILE PERFORMANCE & UTILITIES
+   ══════════════════════════════════════ */
+
+/* Safe area insets for notched devices */
+.safe-area-top { padding-top: env(safe-area-inset-top, 0px); }
+.safe-area-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+/* Hero gold gradient text */
+.hero-gold-text {
+  background: linear-gradient(135deg, var(--gold-300), var(--gold-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Disable heavy animations on touch / mobile devices */
+@media (pointer: coarse) {
+  .product-card:hover {
+    transform: none;
+    box-shadow: 0 4px 20px -6px rgba(26, 20, 18, 0.12);
+  }
+  .product-card::after { display: none; }
+  .card-3d:hover .card-3d-inner { transform: none; }
+  .img-zoom:hover img { transform: none; }
+  .magnetic-hover:hover { transform: none; }
+  .btn-luxury-filled:hover { transform: none; }
+  .gradient-border::before { display: none; }
+
+  /* Reduce backdrop-filter complexity on mobile */
+  .glass { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+}
+
+/* Product card tap scale on mobile */
+@media (pointer: coarse) {
+  .product-card:active {
+    transform: scale(0.98);
+    transition-duration: 0.15s;
+  }
+}
+
+/* Override overscroll on drawers / modals */
+.overscroll-contain { overscroll-behavior: contain; }
+
+/* xs breakpoint — small phones */
+@media (min-width: 475px) {
+  .xs\:inline { display: inline; }
+  .xs\:flex { display: flex; }
+  .xs\:hidden { display: none; }
+  .xs\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

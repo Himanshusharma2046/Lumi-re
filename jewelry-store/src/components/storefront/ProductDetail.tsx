@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,7 +11,6 @@ import {
   Heart,
   Copy,
   Check,
-  Sparkles,
   ShieldCheck,
   Truck,
   RefreshCw,
@@ -39,13 +38,38 @@ export default function ProductDetailClient({ product }: ProductDetailProps) {
   const [selectedSize, setSelectedSize] = useState(product.size?.[0] || "");
   const [showShare, setShowShare] = useState(false);
 
+  // Touch swipe state for image gallery
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+
   const images = product.images || [];
-  const primaryIdx = images.findIndex((img: any) => img.isPrimary);
   const sortedImages = [...images].sort((a: any, b: any) => {
     if (a.isPrimary) return -1;
     if (b.isPrimary) return 1;
     return (a.displayOrder || 0) - (b.displayOrder || 0);
   });
+
+  const goToPrev = useCallback(() => {
+    setActiveImage((prev) => (prev === 0 ? sortedImages.length - 1 : prev - 1));
+  }, [sortedImages.length]);
+
+  const goToNext = useCallback(() => {
+    setActiveImage((prev) => (prev === sortedImages.length - 1 ? 0 : prev + 1));
+  }, [sortedImages.length]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+  const handleTouchEnd = () => {
+    const diff = touchStartX.current - touchEndX.current;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) goToNext();
+      else goToPrev();
+    }
+  };
 
   const hasDiscount =
     product.discount &&
@@ -191,7 +215,7 @@ export default function ProductDetailClient({ product }: ProductDetailProps) {
             </>
           )}
           <span>/</span>
-          <span className="text-obsidian-700 font-medium truncate max-w-[200px]">
+          <span className="text-obsidian-700 font-medium truncate max-w-50">
             {product.name}
           </span>
         </nav>
@@ -201,11 +225,14 @@ export default function ProductDetailClient({ product }: ProductDetailProps) {
       <div className="max-w-7xl mx-auto px-4 lg:px-6 pb-16">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-14">
           {/* ═══ Left — Image Gallery ═══ */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {/* Main Image */}
             <div
-              className="relative aspect-square bg-obsidian-50 rounded-2xl overflow-hidden cursor-zoom-in group"
+              className="relative aspect-square bg-obsidian-50 rounded-xl sm:rounded-2xl overflow-hidden cursor-zoom-in group"
               onClick={() => setShowFullscreen(true)}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
             >
               {sortedImages[activeImage] ? (
                 <Image
@@ -224,62 +251,59 @@ export default function ProductDetailClient({ product }: ProductDetailProps) {
                 </div>
               )}
 
-              {/* Zoom hint */}
-              <div className="absolute bottom-4 right-4 p-2 bg-white/80 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+              {/* Zoom hint — desktop only */}
+              <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 p-2 bg-white/80 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-opacity hidden sm:flex">
                 <ZoomIn className="w-4 h-4 text-obsidian-600" />
               </div>
 
               {/* Badges */}
-              <div className="absolute top-4 left-4 flex flex-col gap-1.5">
+              <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex flex-col gap-1.5">
                 {hasDiscount && (
-                  <span className="px-2.5 py-1 bg-rose-gold text-white text-[10px] font-bold tracking-wider uppercase rounded-md">
+                  <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-rose-gold text-white text-[9px] sm:text-[10px] font-bold tracking-wider uppercase rounded-md">
                     {discountPercent}% Off
                   </span>
                 )}
                 {product.isFeatured && (
-                  <span className="px-2.5 py-1 bg-gold-500 text-white text-[10px] font-bold tracking-wider uppercase rounded-md">
+                  <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-gold-500 text-white text-[9px] sm:text-[10px] font-bold tracking-wider uppercase rounded-md">
                     Bestseller
                   </span>
                 )}
               </div>
 
-              {/* Nav arrows */}
+              {/* Image counter on mobile */}
+              {sortedImages.length > 1 && (
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-black/50 backdrop-blur-sm rounded-full text-white text-[10px] font-medium sm:hidden">
+                  {activeImage + 1} / {sortedImages.length}
+                </div>
+              )}
+
+              {/* Nav arrows — always visible on mobile, hover-reveal on desktop */}
               {sortedImages.length > 1 && (
                 <>
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveImage((prev) =>
-                        prev === 0 ? sortedImages.length - 1 : prev - 1
-                      );
-                    }}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-obsidian-700 hover:bg-white transition-all opacity-0 group-hover:opacity-100"
+                    onClick={(e) => { e.stopPropagation(); goToPrev(); }}
+                    className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-obsidian-700 active:scale-90 transition-all sm:opacity-0 sm:group-hover:opacity-100 touch-manipulation"
                   >
-                    <ChevronLeft className="w-4 h-4" />
+                    <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveImage((prev) =>
-                        prev === sortedImages.length - 1 ? 0 : prev + 1
-                      );
-                    }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-obsidian-700 hover:bg-white transition-all opacity-0 group-hover:opacity-100"
+                    onClick={(e) => { e.stopPropagation(); goToNext(); }}
+                    className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-obsidian-700 active:scale-90 transition-all sm:opacity-0 sm:group-hover:opacity-100 touch-manipulation"
                   >
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 </>
               )}
             </div>
 
-            {/* Thumbnails */}
+            {/* Thumbnails — horizontal scroll on mobile */}
             {sortedImages.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+              <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 -mx-1 px-1">
                 {sortedImages.map((img: any, i: number) => (
                   <button
                     key={i}
                     onClick={() => setActiveImage(i)}
-                    className={`relative w-16 h-16 lg:w-20 lg:h-20 rounded-lg overflow-hidden shrink-0 border-2 transition-all ${
+                    className={`relative w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg overflow-hidden shrink-0 border-2 transition-all touch-manipulation ${
                       i === activeImage
                         ? "border-gold-500 ring-1 ring-gold-500/30"
                         : "border-transparent hover:border-obsidian-200"
@@ -504,10 +528,10 @@ export default function ProductDetailClient({ product }: ProductDetailProps) {
                     <button
                       key={s}
                       onClick={() => setSelectedSize(s)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
+                      className={`px-4 py-2.5 sm:py-2 rounded-lg text-sm font-medium border transition-all touch-manipulation min-w-11 ${
                         selectedSize === s
                           ? "border-gold-500 bg-gold-50 text-gold-800"
-                          : "border-obsidian-200 text-obsidian-600 hover:border-gold-300"
+                          : "border-obsidian-200 text-obsidian-600 hover:border-gold-300 active:bg-obsidian-50"
                       }`}
                     >
                       {s}
@@ -523,8 +547,8 @@ export default function ProductDetailClient({ product }: ProductDetailProps) {
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="flex gap-3 mb-6">
+            {/* Action Buttons — hidden on mobile (shown as sticky bar instead) */}
+            <div className="hidden sm:flex gap-3 mb-6">
               <a
                 href={`https://wa.me/919876543210?text=${encodeURIComponent(
                   `Hi, I'm interested in "${product.name}" (SKU: ${product.sku})${selectedSize ? ` in size ${selectedSize}` : ""}. Price: ${formatPrice(product.finalPrice)}`
@@ -537,7 +561,7 @@ export default function ProductDetailClient({ product }: ProductDetailProps) {
               </a>
               <button
                 onClick={() => {}}
-                className="w-12 h-12 rounded-xl border border-obsidian-200 flex items-center justify-center text-obsidian-500 hover:text-rose-gold hover:border-rose-gold transition-colors"
+                className="w-12 h-12 rounded-xl border border-obsidian-200 flex items-center justify-center text-obsidian-500 hover:text-rose-gold hover:border-rose-gold transition-colors touch-manipulation"
                 aria-label="Wishlist"
               >
                 <Heart className="w-5 h-5" />
@@ -545,13 +569,13 @@ export default function ProductDetailClient({ product }: ProductDetailProps) {
               <div className="relative">
                 <button
                   onClick={handleShare}
-                  className="w-12 h-12 rounded-xl border border-obsidian-200 flex items-center justify-center text-obsidian-500 hover:text-gold-600 hover:border-gold-400 transition-colors"
+                  className="w-12 h-12 rounded-xl border border-obsidian-200 flex items-center justify-center text-obsidian-500 hover:text-gold-600 hover:border-gold-400 transition-colors touch-manipulation"
                   aria-label="Share"
                 >
                   <Share2 className="w-5 h-5" />
                 </button>
                 {showShare && (
-                  <div className="absolute right-0 top-full mt-2 bg-white border border-obsidian-100 rounded-xl shadow-lg p-3 z-10 min-w-[180px] space-y-2">
+                  <div className="absolute right-0 top-full mt-2 bg-white border border-obsidian-100 rounded-xl shadow-lg p-3 z-10 min-w-45 space-y-2">
                     <a
                       href={whatsappUrl}
                       target="_blank"
@@ -720,17 +744,24 @@ export default function ProductDetailClient({ product }: ProductDetailProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] bg-obsidian-950/95 backdrop-blur-md flex items-center justify-center"
+            className="fixed inset-0 z-60 bg-obsidian-950/95 backdrop-blur-md flex items-center justify-center"
             onClick={() => setShowFullscreen(false)}
           >
             <button
-              className="absolute top-6 right-6 p-2 text-white/60 hover:text-white z-10"
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full text-white/80 hover:text-white z-10 touch-manipulation"
               onClick={() => setShowFullscreen(false)}
+              aria-label="Close"
             >
               <ChevronLeft className="w-6 h-6 rotate-45" />
             </button>
             {sortedImages[activeImage] && (
-              <div className="relative w-[90vw] h-[90vh] max-w-4xl" onClick={(e) => e.stopPropagation()}>
+              <div
+                className="relative w-[92vw] h-[80vh] sm:w-[90vw] sm:h-[90vh] max-w-4xl"
+                onClick={(e) => e.stopPropagation()}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
                 <Image
                   src={sortedImages[activeImage].url}
                   alt={sortedImages[activeImage].alt || product.name}
@@ -738,37 +769,72 @@ export default function ProductDetailClient({ product }: ProductDetailProps) {
                   className="object-contain"
                   sizes="90vw"
                 />
+                {/* Mobile counter */}
+                {sortedImages.length > 1 && (
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/50 backdrop-blur-sm rounded-full text-white text-xs font-medium sm:hidden">
+                    {activeImage + 1} / {sortedImages.length}
+                  </div>
+                )}
               </div>
             )}
             {sortedImages.length > 1 && (
               <>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveImage((prev) =>
-                      prev === 0 ? sortedImages.length - 1 : prev - 1
-                    );
-                  }}
-                  className="absolute left-6 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white"
+                  onClick={(e) => { e.stopPropagation(); goToPrev(); }}
+                  className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white touch-manipulation"
                 >
-                  <ChevronLeft className="w-6 h-6" />
+                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveImage((prev) =>
-                      prev === sortedImages.length - 1 ? 0 : prev + 1
-                    );
-                  }}
-                  className="absolute right-6 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white"
+                  onClick={(e) => { e.stopPropagation(); goToNext(); }}
+                  className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white touch-manipulation"
                 >
-                  <ChevronRight className="w-6 h-6" />
+                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
               </>
             )}
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ══════════════════════════════════════════════════
+         Sticky Mobile CTA Bar
+         ══════════════════════════════════════════════════ */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 sm:hidden bg-white border-t border-obsidian-100 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        <div className="flex items-center gap-2 px-3 py-2.5 safe-area-bottom">
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] text-obsidian-400 truncate">{product.name}</p>
+            <p className="text-sm font-bold text-obsidian-950">{formatPrice(product.finalPrice)}</p>
+          </div>
+          <button
+            onClick={handleShare}
+            className="w-10 h-10 rounded-xl border border-obsidian-200 flex items-center justify-center text-obsidian-500 active:scale-90 transition-transform touch-manipulation shrink-0"
+            aria-label="Share"
+          >
+            <Share2 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => {}}
+            className="w-10 h-10 rounded-xl border border-obsidian-200 flex items-center justify-center text-obsidian-500 active:scale-90 transition-transform touch-manipulation shrink-0"
+            aria-label="Wishlist"
+          >
+            <Heart className="w-4 h-4" />
+          </button>
+          <a
+            href={`https://wa.me/919876543210?text=${encodeURIComponent(
+              `Hi, I'm interested in "${product.name}" (SKU: ${product.sku})${selectedSize ? ` in size ${selectedSize}` : ""}. Price: ${formatPrice(product.finalPrice)}`
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-luxury-filled py-2.5! px-4! text-xs! shrink-0 touch-manipulation"
+          >
+            Enquire
+          </a>
+        </div>
+      </div>
+
+      {/* Bottom spacer for mobile sticky CTA */}
+      <div className="h-20 sm:hidden" />
     </div>
   );
 }

@@ -75,7 +75,7 @@ export default async function AdminDashboard() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Dashboard</h1>
         <p className="text-slate-500 mt-1">
           Overview of your jewelry store
         </p>
@@ -136,10 +136,10 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Recent Price Changes */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6">
+      <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-4">
           <Clock className="w-5 h-5 text-slate-400" />
-          <h2 className="text-lg font-semibold text-slate-800">
+          <h2 className="text-base sm:text-lg font-semibold text-slate-800">
             Recent Price Changes
           </h2>
         </div>
@@ -235,8 +235,8 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6">
-        <h2 className="text-lg font-semibold text-slate-800 mb-4">
+      <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6">
+        <h2 className="text-base sm:text-lg font-semibold text-slate-800 mb-4">
           Quick Actions
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">

@@ -177,11 +177,11 @@ export default function CategoriesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-linear-to-br from-emerald-400 to-emerald-600 text-white">
-              <FolderTree className="w-6 h-6" />
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-3">
+            <div className="p-2 sm:p-2.5 rounded-xl bg-linear-to-br from-emerald-400 to-emerald-600 text-white">
+              <FolderTree className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             Categories
           </h1>
@@ -189,7 +189,7 @@ export default function CategoriesPage() {
         </div>
         <button
           onClick={openCreateForm}
-          className="flex items-center gap-2 px-4 py-2.5 bg-linear-to-br from-emerald-500 to-emerald-600 text-white rounded-xl font-medium text-sm hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg shadow-emerald-500/25"
+          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-linear-to-br from-emerald-500 to-emerald-600 text-white rounded-xl font-medium text-sm hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg shadow-emerald-500/25 w-full sm:w-auto"
         >
           <Plus className="w-4 h-4" />
           Add Category
@@ -205,6 +205,8 @@ export default function CategoriesPage() {
         </div>
       ) : (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          {/* Desktop table */}
+          <div className="hidden md:block">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-slate-500 text-xs uppercase tracking-wider bg-slate-50/80">
@@ -288,6 +290,67 @@ export default function CategoriesPage() {
               ))}
             </tbody>
           </table>
+          </div>
+
+          {/* Mobile card view */}
+          <div className="md:hidden divide-y divide-slate-100">
+            {categories.map((cat) => (
+              <div key={cat._id} className="p-3 sm:p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {cat.image ? (
+                      <img src={cat.image} alt={cat.name} className="w-8 h-8 rounded-lg object-cover" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                        <FolderTree className="w-4 h-4 text-slate-400" />
+                      </div>
+                    )}
+                    <div>
+                      <span className="font-medium text-slate-800">{cat.name}</span>
+                      <span className="block text-xs font-mono text-slate-400">{cat.slug}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => openEditForm(cat)}
+                      className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setDeleteCategory(cat)}
+                      className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs text-slate-400">#{cat.displayOrder}</span>
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full ${
+                    cat.isActive ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"
+                  }`}>
+                    {cat.isActive ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                    {cat.isActive ? "Active" : "Hidden"}
+                  </span>
+                  {cat.subcategories.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {cat.subcategories.slice(0, 3).map((sub, i) => (
+                        <span key={i} className="px-2 py-0.5 text-xs bg-emerald-50 text-emerald-700 rounded-full">
+                          {sub}
+                        </span>
+                      ))}
+                      {cat.subcategories.length > 3 && (
+                        <span className="px-2 py-0.5 text-xs bg-slate-100 text-slate-500 rounded-full">
+                          +{cat.subcategories.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -298,7 +361,7 @@ export default function CategoriesPage() {
         title={editingCategory ? "Edit Category" : "Add Category"}
         maxWidth="max-w-lg"
       >
-        <div className="px-6 py-4 space-y-4 overflow-y-auto max-h-[60vh]">
+        <div className="px-4 sm:px-6 py-4 space-y-4 overflow-y-auto max-h-[60vh]">
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Name *</label>
             <input
@@ -402,7 +465,7 @@ export default function CategoriesPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-100">
+        <div className="flex items-center justify-end gap-3 px-4 sm:px-6 py-4 border-t border-slate-100">
           <button
             onClick={() => setShowForm(false)}
             className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors"

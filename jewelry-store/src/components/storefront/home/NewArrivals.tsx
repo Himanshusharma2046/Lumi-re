@@ -18,22 +18,22 @@ export function NewArrivals({ products }: { products: ProductCardData[] }) {
       <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-gold-500/20 to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-gold-500/20 to-transparent" />
 
-      {/* Ambient glows */}
-      <div className="absolute top-20 right-[10%] w-60 lg:w-80 h-60 lg:h-80 bg-gold-500/[0.04] rounded-full blur-[100px] animate-pulse-glow" />
-      <div className="absolute bottom-20 left-[10%] w-40 lg:w-60 h-40 lg:h-60 bg-gold-400/[0.03] rounded-full blur-[80px] animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
+      {/* Ambient glows — reduced on mobile */}
+      <div className="absolute top-20 right-[10%] w-40 lg:w-80 h-40 lg:h-80 bg-gold-500/[0.04] rounded-full blur-[60px] lg:blur-[100px]" />
+      <div className="absolute bottom-20 left-[10%] w-32 lg:w-60 h-32 lg:h-60 bg-gold-400/[0.03] rounded-full blur-[50px] lg:blur-[80px]" />
 
-      {/* Floating diamonds */}
+      {/* Floating diamonds — hidden on mobile for perf */}
       <motion.div
         animate={{ y: [-10, 10, -10], rotate: [0, 180, 360] }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-32 left-[15%]"
+        className="absolute top-32 left-[15%] hidden lg:block"
       >
         <Diamond className="w-4 h-4 text-gold-500/10" />
       </motion.div>
       <motion.div
         animate={{ y: [8, -8, 8], rotate: [360, 180, 0] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        className="absolute bottom-40 right-[20%]"
+        className="absolute bottom-40 right-[20%] hidden lg:block"
       >
         <Diamond className="w-3 h-3 text-gold-400/10" />
       </motion.div>

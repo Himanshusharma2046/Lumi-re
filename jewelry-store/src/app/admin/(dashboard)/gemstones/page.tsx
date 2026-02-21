@@ -257,11 +257,11 @@ export default function GemstonesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-linear-to-br from-purple-400 to-purple-600 text-white">
-              <Gem className="w-6 h-6" />
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-3">
+            <div className="p-2 sm:p-2.5 rounded-xl bg-linear-to-br from-purple-400 to-purple-600 text-white">
+              <Gem className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             Gemstones
           </h1>
@@ -269,7 +269,7 @@ export default function GemstonesPage() {
         </div>
         <button
           onClick={openCreateForm}
-          className="flex items-center gap-2 px-4 py-2.5 bg-linear-to-br from-purple-500 to-purple-600 text-white rounded-xl font-medium text-sm hover:from-purple-600 hover:to-purple-700 transition-all shadow-lg shadow-purple-500/25"
+          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-linear-to-br from-purple-500 to-purple-600 text-white rounded-xl font-medium text-sm hover:from-purple-600 hover:to-purple-700 transition-all shadow-lg shadow-purple-500/25 w-full sm:w-auto"
         >
           <Plus className="w-4 h-4" />
           Add Gemstone
@@ -290,15 +290,15 @@ export default function GemstonesPage() {
             return (
               <div key={gem._id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                 <div
-                  className="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-slate-50/50 transition-colors"
+                  className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-slate-50/50 transition-colors"
                   onClick={() => setExpandedId(isExpanded ? null : gem._id)}
                 >
-                  <div className="flex items-center gap-4">
-                    <button className="text-slate-400">
+                  <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+                    <button className="text-slate-400 shrink-0">
                       {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                     </button>
-                    <div>
-                      <div className="flex items-center gap-3">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
                         <h3 className="font-semibold text-slate-800">{gem.name}</h3>
                         <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${typeBadge(gem.type)}`}>
                           {gem.type}
@@ -313,7 +313,7 @@ export default function GemstonesPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center gap-1 sm:gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
                     <button
                       onClick={() => openEditForm(gem)}
                       className="p-2 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
@@ -330,8 +330,10 @@ export default function GemstonesPage() {
                 </div>
 
                 {isExpanded && (
-                  <div className="border-t border-slate-100 px-6 py-4 bg-slate-50/50">
-                    <table className="w-full text-sm">
+                  <div className="border-t border-slate-100 px-3 sm:px-6 py-4 bg-slate-50/50">
+                    {/* Desktop table */}
+                    <div className="hidden sm:block overflow-x-auto">
+                      <table className="w-full text-sm">
                       <thead>
                         <tr className="text-left text-slate-500 text-xs uppercase tracking-wider">
                           <th className="pb-3 font-medium">Variant</th>
@@ -421,6 +423,73 @@ export default function GemstonesPage() {
                         })}
                       </tbody>
                     </table>
+                    </div>
+
+                    {/* Mobile card view */}
+                    <div className="sm:hidden space-y-3">
+                      {gem.variants.map((variant, vi) => {
+                        const priceKey = `${gem._id}-${vi}`;
+                        const isEditingPrice = priceKey in editingPrices;
+                        const isSavingThis = savingPrice === priceKey;
+
+                        return (
+                          <div key={vi} className="p-3 bg-white rounded-xl border border-slate-100/80 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-slate-700">{variant.name}</span>
+                              <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                                variant.isActive ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"
+                              }`}>
+                                {variant.isActive ? "Active" : "Inactive"}
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap gap-2 text-xs text-slate-500">
+                              <span>{variant.shape} / {variant.cut}</span>
+                              <span className={`px-2 py-0.5 rounded-full font-medium ${
+                                variant.origin === "Natural" ? "bg-emerald-100 text-emerald-700" :
+                                variant.origin === "Lab-Created" ? "bg-blue-100 text-blue-700" :
+                                "bg-amber-100 text-amber-700"
+                              }`}>{variant.origin}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-slate-500">Price/Carat:</span>
+                              {isEditingPrice ? (
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="number"
+                                    value={editingPrices[priceKey]}
+                                    onChange={(e) =>
+                                      setEditingPrices((prev) => ({
+                                        ...prev,
+                                        [priceKey]: parseFloat(e.target.value) || 0,
+                                      }))
+                                    }
+                                    className="w-24 px-2 py-1 border border-purple-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+                                    autoFocus
+                                  />
+                                  <button
+                                    onClick={() => savePrice(gem, vi)}
+                                    disabled={isSavingThis}
+                                    className="p-1 text-green-600 hover:bg-green-50 rounded disabled:opacity-50"
+                                  >
+                                    {isSavingThis ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                  </button>
+                                  <button onClick={() => cancelPriceEdit(gem._id, vi)} className="p-1 text-slate-400 hover:bg-slate-100 rounded">
+                                    <X className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => startPriceEdit(gem._id, vi, variant.pricePerCarat)}
+                                  className="text-purple-600 font-medium text-sm"
+                                >
+                                  {formatPriceDecimal(variant.pricePerCarat)} ✎
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
@@ -437,7 +506,7 @@ export default function GemstonesPage() {
         maxWidth="max-w-3xl"
       >
         <div className="px-6 py-4 space-y-4 overflow-y-auto max-h-[60vh]">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-medium text-slate-600 mb-1">Name *</label>
               <input
@@ -497,7 +566,7 @@ export default function GemstonesPage() {
                       </button>
                     )}
                   </div>
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <input
                       type="text"
                       value={v.name}
@@ -527,7 +596,7 @@ export default function GemstonesPage() {
                       {ORIGINS.map((o) => <option key={o} value={o}>{o}</option>)}
                     </select>
                   </div>
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <input
                       type="text"
                       value={v.clarity}

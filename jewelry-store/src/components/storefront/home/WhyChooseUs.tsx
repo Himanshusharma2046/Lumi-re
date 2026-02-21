@@ -65,7 +65,7 @@ export function WhyChooseUs() {
           initial={{ opacity: 0, y: 24 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7 }}
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-16"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
             <span className="w-12 h-px bg-linear-to-r from-transparent to-gold-400" />
@@ -97,8 +97,7 @@ export function WhyChooseUs() {
                 delay: i * 0.1,
                 ease: [0.25, 0.46, 0.45, 0.94],
               }}
-              whileHover={{ y: -6, transition: { duration: 0.3 } }}
-              className="group gradient-border rounded-2xl p-6 sm:p-7 hover:shadow-xl hover:shadow-gold-500/5 transition-all duration-500 cursor-default"
+              className="group gradient-border rounded-2xl p-5 sm:p-7 hover:shadow-xl hover:shadow-gold-500/5 transition-all duration-500 cursor-default"
             >
               {/* Icon with gradient bg */}
               <div className={`w-12 h-12 rounded-xl bg-linear-to-br ${feature.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>

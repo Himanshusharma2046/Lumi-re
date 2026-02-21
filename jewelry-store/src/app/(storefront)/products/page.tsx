@@ -192,7 +192,7 @@ export default function ProductsPage() {
           backgroundSize: "40px 40px",
         }} />
         <div className="grain-overlay absolute inset-0" />
-        <div className="max-w-7xl mx-auto px-6 py-12 lg:py-16 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 lg:py-16 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -242,7 +242,7 @@ export default function ProductsPage() {
             {/* Mobile filter button */}
             <button
               onClick={() => setMobileFiltersOpen(true)}
-              className="lg:hidden flex items-center gap-2 px-3.5 py-2.5 bg-white border border-obsidian-200 rounded-xl text-sm font-medium text-obsidian-700 hover:border-gold-400 transition-colors"
+              className="lg:hidden flex items-center gap-2 px-3.5 py-2.5 bg-white border border-obsidian-200 rounded-xl text-sm font-medium text-obsidian-700 hover:border-gold-400 transition-colors touch-manipulation active:bg-obsidian-50"
             >
               <SlidersHorizontal className="w-4 h-4" />
               Filters
@@ -402,30 +402,30 @@ export default function ProductsPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-10">
+              <div className="flex items-center justify-center gap-1.5 sm:gap-2 mt-10">
                 <button
                   disabled={filters.page <= 1}
                   onClick={() => updateFilter("page", filters.page - 1)}
-                  className="p-2.5 rounded-lg border border-obsidian-200 text-obsidian-600 hover:border-gold-400 hover:text-gold-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="w-10 h-10 sm:w-10 sm:h-10 rounded-lg border border-obsidian-200 flex items-center justify-center text-obsidian-600 hover:border-gold-400 hover:text-gold-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors touch-manipulation"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                {Array.from({ length: Math.min(totalPages, 7) }).map((_, i) => {
+                {Array.from({ length: Math.min(totalPages, 5) }).map((_, i) => {
                   let page: number;
-                  if (totalPages <= 7) {
+                  if (totalPages <= 5) {
                     page = i + 1;
-                  } else if (filters.page <= 4) {
+                  } else if (filters.page <= 3) {
                     page = i + 1;
-                  } else if (filters.page >= totalPages - 3) {
-                    page = totalPages - 6 + i;
+                  } else if (filters.page >= totalPages - 2) {
+                    page = totalPages - 4 + i;
                   } else {
-                    page = filters.page - 3 + i;
+                    page = filters.page - 2 + i;
                   }
                   return (
                     <button
                       key={page}
                       onClick={() => updateFilter("page", page)}
-                      className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                      className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors touch-manipulation ${
                         page === filters.page
                           ? "bg-gold-500 text-white"
                           : "border border-obsidian-200 text-obsidian-600 hover:border-gold-400 hover:text-gold-600"
@@ -438,7 +438,7 @@ export default function ProductsPage() {
                 <button
                   disabled={filters.page >= totalPages}
                   onClick={() => updateFilter("page", filters.page + 1)}
-                  className="p-2.5 rounded-lg border border-obsidian-200 text-obsidian-600 hover:border-gold-400 hover:text-gold-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="w-10 h-10 sm:w-10 sm:h-10 rounded-lg border border-obsidian-200 flex items-center justify-center text-obsidian-600 hover:border-gold-400 hover:text-gold-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors touch-manipulation"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -460,24 +460,28 @@ export default function ProductsPage() {
               onClick={() => setMobileFiltersOpen(false)}
             />
             <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 280 }}
-              className="fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-white z-[51] overflow-y-auto lg:hidden"
+              className="fixed left-0 right-0 bottom-0 max-h-[85vh] bg-white z-[51] overflow-y-auto lg:hidden rounded-t-2xl overscroll-contain"
             >
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-6">
+              {/* Drag handle */}
+              <div className="sticky top-0 bg-white z-10 pt-3 pb-2 px-5 border-b border-obsidian-100 rounded-t-2xl">
+                <div className="w-10 h-1 bg-obsidian-200 rounded-full mx-auto mb-3" />
+                <div className="flex items-center justify-between">
                   <h3 className="font-display text-lg font-semibold text-obsidian-900">
                     Filters
                   </h3>
                   <button
                     onClick={() => setMobileFiltersOpen(false)}
-                    className="p-2 text-obsidian-600"
+                    className="w-9 h-9 flex items-center justify-center rounded-full bg-obsidian-100 text-obsidian-600 touch-manipulation"
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
+              </div>
+              <div className="p-5 pb-6">
                 <FilterSidebar
                   filters={filters}
                   updateFilter={updateFilter}
@@ -487,9 +491,11 @@ export default function ProductsPage() {
                   gemstones={gemstones}
                   activeFilterCount={activeFilterCount}
                 />
+              </div>
+              <div className="sticky bottom-0 bg-white border-t border-obsidian-100 p-4 safe-area-bottom">
                 <button
                   onClick={() => setMobileFiltersOpen(false)}
-                  className="btn-luxury-filled w-full mt-6 text-xs"
+                  className="btn-luxury-filled w-full text-xs"
                 >
                   Show {total} Result{total !== 1 ? "s" : ""}
                 </button>

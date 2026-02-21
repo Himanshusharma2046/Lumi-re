@@ -1,11 +1,15 @@
 "use client";
 
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Menu } from "lucide-react";
 import { logoutAction } from "@/app/admin/actions";
 import { useSession } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
 
-export default function AdminTopbar() {
+interface AdminTopbarProps {
+  onMenuToggle: () => void;
+}
+
+export default function AdminTopbar({ onMenuToggle }: AdminTopbarProps) {
   const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -22,16 +26,23 @@ export default function AdminTopbar() {
   }, []);
 
   return (
-    <header className="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-6 shrink-0">
-      <div>
-        {/* Breadcrumb or page title can go here */}
+    <header className="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-3 sm:px-4 md:px-6 shrink-0">
+      <div className="flex items-center gap-3">
+        {/* Mobile hamburger */}
+        <button
+          onClick={onMenuToggle}
+          className="md:hidden p-2 -ml-1 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors"
+          aria-label="Toggle sidebar"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
       </div>
 
       {/* User menu */}
       <div className="relative" ref={menuRef}>
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-100 transition-colors"
+          className="flex items-center gap-3 px-2 sm:px-3 py-2 rounded-xl hover:bg-slate-100 transition-colors"
         >
           <div className="w-8 h-8 rounded-full bg-linear-to-br from-amber-400 to-amber-600 flex items-center justify-center">
             <User className="w-4 h-4 text-white" />

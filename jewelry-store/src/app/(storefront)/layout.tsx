@@ -9,7 +9,7 @@ export default function StorefrontLayout({
   return (
     <>
       <Navbar />
-      <main className="min-h-screen overflow-x-hidden">{children}</main>
+      <main className="min-h-screen overflow-x-hidden pb-14 lg:pb-0">{children}</main>
       <Footer />
     </>
   );

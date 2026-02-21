@@ -96,23 +96,21 @@ export default function PriceUpdatePage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-linear-to-br from-orange-400 to-orange-600 text-white">
-              <DollarSign className="w-6 h-6" />
-            </div>
-            Price Recalculation
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Recalculate all product prices based on current metal & gemstone rates
-          </p>
-        </div>
+      <div>
+        <h1 className="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-3">
+          <div className="p-2 sm:p-2.5 rounded-xl bg-linear-to-br from-orange-400 to-orange-600 text-white">
+            <DollarSign className="w-5 h-5 sm:w-6 sm:h-6" />
+          </div>
+          Price Recalculation
+        </h1>
+        <p className="mt-1 text-sm text-slate-500">
+          Recalculate all product prices based on current metal & gemstone rates
+        </p>
       </div>
 
       {/* Info card */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-        <div className="flex items-start gap-4">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 sm:p-6">
+        <div className="flex items-start gap-3 sm:gap-4">
           <div className="p-3 rounded-xl bg-amber-50">
             <AlertTriangle className="w-6 h-6 text-amber-600" />
           </div>
@@ -127,7 +125,7 @@ export default function PriceUpdatePage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 mt-6">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-6">
           <button
             onClick={handlePreview}
             disabled={loading || applying}
@@ -141,7 +139,7 @@ export default function PriceUpdatePage() {
             <button
               onClick={handleApply}
               disabled={applying}
-              className="flex items-center gap-2 px-5 py-2.5 bg-linear-to-br from-green-500 to-green-600 text-white rounded-xl font-medium text-sm hover:from-green-600 hover:to-green-700 disabled:opacity-50 transition-all shadow-lg shadow-green-500/25"
+              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-linear-to-br from-green-500 to-green-600 text-white rounded-xl font-medium text-sm hover:from-green-600 hover:to-green-700 disabled:opacity-50 transition-all shadow-lg shadow-green-500/25"
             >
               {applying ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
               Apply Changes
@@ -201,7 +199,7 @@ export default function PriceUpdatePage() {
           {/* Changes table */}
           {preview.changes.length > 0 && (
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-slate-100">
+              <div className="px-4 sm:px-6 py-4 border-b border-slate-100">
                 <h3 className="font-semibold text-slate-800">
                   Price Changes {preview.dryRun ? "(Preview)" : "(Applied)"}
                 </h3>
@@ -212,6 +210,8 @@ export default function PriceUpdatePage() {
                 </p>
               </div>
 
+              {/* Desktop table */}
+              <div className="hidden sm:block">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-slate-500 text-xs uppercase tracking-wider bg-slate-50/80">
@@ -247,6 +247,34 @@ export default function PriceUpdatePage() {
                   ))}
                 </tbody>
               </table>
+              </div>
+
+              {/* Mobile card view */}
+              <div className="sm:hidden divide-y divide-slate-100">
+                {preview.changes.map((change) => (
+                  <div key={change.productId} className="p-3 space-y-1.5">
+                    <p className="font-medium text-slate-800 text-sm line-clamp-1">{change.name}</p>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-500">Old: {formatPrice(change.oldPrice)}</span>
+                      <span className="font-semibold text-slate-800">New: {formatPrice(change.newPrice)}</span>
+                    </div>
+                    <div className="text-right">
+                      <span className={`inline-flex items-center gap-0.5 text-sm font-medium ${
+                        change.diff > 0 ? "text-red-600" : change.diff < 0 ? "text-green-600" : "text-slate-400"
+                      }`}>
+                        {change.diff > 0 ? (
+                          <ArrowUpRight className="w-3.5 h-3.5" />
+                        ) : change.diff < 0 ? (
+                          <ArrowDownRight className="w-3.5 h-3.5" />
+                        ) : (
+                          <Minus className="w-3.5 h-3.5" />
+                        )}
+                        {change.diff > 0 ? "+" : ""}{formatPrice(change.diff)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
 
               {preview.changes.length >= 50 && (
                 <div className="px-6 py-3 border-t border-slate-100 text-center">

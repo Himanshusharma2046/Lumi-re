@@ -265,11 +265,11 @@ export default function MetalsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-linear-to-br from-amber-400 to-amber-600 text-white">
-              <CircleDot className="w-6 h-6" />
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-3">
+            <div className="p-2 sm:p-2.5 rounded-xl bg-linear-to-br from-amber-400 to-amber-600 text-white">
+              <CircleDot className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             Metals
           </h1>
@@ -277,7 +277,7 @@ export default function MetalsPage() {
         </div>
         <button
           onClick={openCreateForm}
-          className="flex items-center gap-2 px-4 py-2.5 bg-linear-to-br from-amber-500 to-amber-600 text-white rounded-xl font-medium text-sm hover:from-amber-600 hover:to-amber-700 transition-all shadow-lg shadow-amber-500/25"
+          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-linear-to-br from-amber-500 to-amber-600 text-white rounded-xl font-medium text-sm hover:from-amber-600 hover:to-amber-700 transition-all shadow-lg shadow-amber-500/25 w-full sm:w-auto"
         >
           <Plus className="w-4 h-4" />
           Add Metal
@@ -299,15 +299,15 @@ export default function MetalsPage() {
               <div key={metal._id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                 {/* Metal header */}
                 <div
-                  className="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-slate-50/50 transition-colors"
+                  className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-slate-50/50 transition-colors"
                   onClick={() => setExpandedId(isExpanded ? null : metal._id)}
                 >
-                  <div className="flex items-center gap-4">
-                    <button className="text-slate-400">
+                  <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+                    <button className="text-slate-400 shrink-0">
                       {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                     </button>
-                    <div>
-                      <div className="flex items-center gap-3">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
                         <h3 className="font-semibold text-slate-800">{metal.name}</h3>
                         <span className="px-2 py-0.5 text-xs font-mono font-medium bg-slate-100 text-slate-600 rounded-md">
                           {metal.code}
@@ -323,7 +323,7 @@ export default function MetalsPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center gap-1 sm:gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
                     <button
                       onClick={() => openEditForm(metal)}
                       className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
@@ -343,8 +343,10 @@ export default function MetalsPage() {
 
                 {/* Expanded variants */}
                 {isExpanded && (
-                  <div className="border-t border-slate-100 px-6 py-4 bg-slate-50/50">
-                    <table className="w-full text-sm">
+                  <div className="border-t border-slate-100 px-3 sm:px-6 py-4 bg-slate-50/50">
+                    {/* Desktop table */}
+                    <div className="hidden sm:block overflow-x-auto">
+                      <table className="w-full text-sm">
                       <thead>
                         <tr className="text-left text-slate-500 text-xs uppercase tracking-wider">
                           <th className="pb-3 font-medium">Variant</th>
@@ -433,8 +435,67 @@ export default function MetalsPage() {
                         })}
                       </tbody>
                     </table>
+                    </div>
 
-                    <div className="mt-3 pt-3 border-t border-slate-100 flex gap-6 text-xs text-slate-500">
+                    {/* Mobile card view */}
+                    <div className="sm:hidden space-y-3">
+                      {metal.variants.map((variant, vi) => {
+                        const priceKey = `${metal._id}-${vi}`;
+                        const isEditingPrice = priceKey in editingPrices;
+                        const isSavingThis = savingPrice === priceKey;
+
+                        return (
+                          <div key={vi} className="p-3 bg-white rounded-xl border border-slate-100/80 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-slate-700">{variant.name}</span>
+                              <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                                variant.isActive ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"
+                              }`}>
+                                {variant.isActive ? "Active" : "Inactive"}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-slate-500">Purity: {variant.purity}%</span>
+                              {isEditingPrice ? (
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="number"
+                                    value={editingPrices[priceKey]}
+                                    onChange={(e) =>
+                                      setEditingPrices((prev) => ({
+                                        ...prev,
+                                        [priceKey]: parseFloat(e.target.value) || 0,
+                                      }))
+                                    }
+                                    className="w-24 px-2 py-1 border border-amber-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+                                    autoFocus
+                                  />
+                                  <button
+                                    onClick={() => savePrice(metal, vi)}
+                                    disabled={isSavingThis}
+                                    className="p-1 text-green-600 hover:bg-green-50 rounded disabled:opacity-50"
+                                  >
+                                    {isSavingThis ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                  </button>
+                                  <button onClick={() => cancelPriceEdit(metal._id, vi)} className="p-1 text-slate-400 hover:bg-slate-100 rounded">
+                                    <X className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => startPriceEdit(metal._id, vi, variant.pricePerGram)}
+                                  className="text-amber-600 font-medium text-sm"
+                                >
+                                  {formatPriceDecimal(variant.pricePerGram)} ✎
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div className="mt-3 pt-3 border-t border-slate-100 flex flex-wrap gap-3 sm:gap-6 text-xs text-slate-500">
                       <span>Making: {metal.defaultMakingChargeType === "flat" ? formatPriceDecimal(metal.defaultMakingCharges) : `${metal.defaultMakingCharges}%`}</span>
                       <span>Wastage: {metal.defaultWastagePercentage}%</span>
                     </div>
@@ -455,7 +516,7 @@ export default function MetalsPage() {
       >
         <div className="px-6 py-4 space-y-4 overflow-y-auto max-h-[60vh]">
           {/* Basic fields */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-medium text-slate-600 mb-1">Name *</label>
               <input
@@ -491,7 +552,7 @@ export default function MetalsPage() {
           </div>
 
           {/* Defaults */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-medium text-slate-600 mb-1">Wastage %</label>
               <input
@@ -539,7 +600,7 @@ export default function MetalsPage() {
             <div className="space-y-3">
               {form.variants.map((v, i) => (
                 <div key={i} className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
-                  <div className="flex-1 grid grid-cols-3 gap-2">
+                  <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <input
                       type="text"
                       value={v.name}

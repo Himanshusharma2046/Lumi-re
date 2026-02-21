@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,6 +13,10 @@ import {
   Phone,
   MapPin,
   Sparkles,
+  Home,
+  ShoppingBag,
+  Grid3X3,
+  MessageCircle,
 } from "lucide-react";
 
 interface CategoryNav {
@@ -42,24 +46,39 @@ export default function Navbar() {
       .catch(() => {});
   }, []);
 
-  // Scroll listener
+  // Scroll listener — throttled with passive
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 40);
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 40);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   // Close mobile menu on route change
+  const prevPathRef = useRef(pathname);
   useEffect(() => {
-    setMobileOpen(false);
-    setSearchOpen(false);
-    setActiveMega(null);
+    if (prevPathRef.current !== pathname) {
+      prevPathRef.current = pathname;
+      setMobileOpen(false);
+      setSearchOpen(false);
+      setActiveMega(null);
+    }
   }, [pathname]);
 
   // Lock body scroll when mobile menu open
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [mobileOpen]);
 
   const handleSearch = useCallback(
@@ -76,79 +95,65 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ── Top Bar ── */}
-      <motion.div
-        initial={{ y: -40 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="bg-obsidian-950 text-obsidian-300 text-xs tracking-widest uppercase hidden lg:block"
-      >
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-9">
-          <div className="flex items-center gap-6">
-            <a href="tel:+919876543210" className="flex items-center gap-1.5 hover:text-gold-400 transition-colors">
-              <Phone className="w-3 h-3" />
-              <span>+91 98765 43210</span>
-            </a>
-            <span className="flex items-center gap-1.5">
-              <MapPin className="w-3 h-3" />
-              Mumbai, India
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5 text-gold-400">
-            <Sparkles className="w-3 h-3" />
-            <span>Free Shipping on Orders Above ₹25,000</span>
-            <Sparkles className="w-3 h-3" />
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/products" className="hover:text-gold-400 transition-colors">
-              All Collections
-            </Link>
-            <span className="text-obsidian-700">|</span>
-            <Link href="/about" className="hover:text-gold-400 transition-colors">
-              About
-            </Link>
-          </div>
+      {/* ── Scrolling Announcement Marquee (all devices) ── */}
+      <div className="bg-obsidian-950 text-white overflow-hidden h-8 sm:h-9 flex items-center relative">
+        <div className="animate-marquee whitespace-nowrap flex items-center gap-12 sm:gap-16">
+          {[...Array(3)].map((_, repeat) => (
+            <div key={repeat} className="flex items-center gap-12 sm:gap-16 shrink-0">
+              <span className="flex items-center gap-2 text-[10px] sm:text-xs tracking-wider uppercase">
+                <Sparkles className="w-3 h-3 text-gold-400" />
+                Free Shipping on Orders Above ₹25,000
+              </span>
+              <span className="flex items-center gap-2 text-[10px] sm:text-xs tracking-wider uppercase">
+                <Sparkles className="w-3 h-3 text-gold-400" />
+                BIS Hallmarked Gold &amp; Certified Diamonds
+              </span>
+              <span className="flex items-center gap-2 text-[10px] sm:text-xs tracking-wider uppercase">
+                <Sparkles className="w-3 h-3 text-gold-400" />
+                100% Transparent Pricing
+              </span>
+              <span className="flex items-center gap-2 text-[10px] sm:text-xs tracking-wider uppercase">
+                <Sparkles className="w-3 h-3 text-gold-400" />
+                Lifetime Exchange &amp; Buyback
+              </span>
+            </div>
+          ))}
         </div>
-      </motion.div>
+      </div>
 
       {/* ── Main Navbar ── */}
-      <motion.header
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className={`sticky top-0 z-50 transition-all duration-500 ${
+      <header
+        className={`sticky top-0 z-50 transition-all duration-300 ${
           isScrolled
             ? "bg-white/95 backdrop-blur-xl shadow-[0_2px_20px_rgba(0,0,0,0.06)]"
             : "bg-white"
         }`}
       >
         <nav className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="flex items-center justify-between h-18 lg:h-20">
+          <div className="flex items-center justify-between h-14 sm:h-16 lg:h-20">
             {/* ── Mobile Menu Toggle ── */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="lg:hidden p-2.5 -ml-2 text-obsidian-800 hover:text-gold-600 transition-colors touch-manipulation"
+              className="lg:hidden flex items-center justify-center w-11 h-11 -ml-2 text-obsidian-800 hover:text-gold-600 transition-colors touch-manipulation active:bg-obsidian-50 rounded-xl"
               aria-label="Toggle menu"
             >
-              <motion.div
-                animate={mobileOpen ? { rotate: 90 } : { rotate: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </motion.div>
+              {mobileOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
             </button>
 
             {/* ── Logo ── */}
-            <Link href="/" className="flex items-center gap-2.5 group">
+            <Link href="/" className="flex items-center gap-2 group">
               <div className="relative">
-                <Diamond className="w-7 h-7 text-gold-500 group-hover:text-gold-600 transition-colors duration-300" />
-                <div className="absolute inset-0 w-7 h-7 bg-gold-400/20 rounded-full blur-lg group-hover:bg-gold-400/30 transition-all" />
+                <Diamond className="w-6 h-6 sm:w-7 sm:h-7 text-gold-500 group-hover:text-gold-600 transition-colors duration-300" />
               </div>
               <div className="flex flex-col -space-y-1">
-                <span className="font-display text-xl lg:text-2xl font-bold tracking-wide text-obsidian-950">
+                <span className="font-display text-lg sm:text-xl lg:text-2xl font-bold tracking-wide text-obsidian-950">
                   Lumière
                 </span>
-                <span className="text-[9px] tracking-[0.35em] uppercase text-obsidian-400 font-medium">
+                <span className="text-[8px] sm:text-[9px] tracking-[0.35em] uppercase text-obsidian-400 font-medium">
                   Fine Jewels
                 </span>
               </div>
@@ -168,7 +173,8 @@ export default function Navbar() {
               >
                 <button
                   className={`flex items-center gap-1 px-4 py-2 text-sm font-medium tracking-wide transition-colors ${
-                    pathname.startsWith("/category") || pathname.startsWith("/products")
+                    pathname.startsWith("/category") ||
+                    pathname.startsWith("/products")
                       ? "text-gold-600"
                       : "text-obsidian-700 hover:text-gold-600"
                   }`}
@@ -189,10 +195,9 @@ export default function Navbar() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 8 }}
                       transition={{ duration: 0.25, ease: "easeOut" }}
-                      className="absolute top-full left-1/2 -translate-x-1/2 w-[700px] bg-white rounded-b-2xl shadow-2xl shadow-black/8 border border-obsidian-100/80 p-8 z-50"
+                      className="absolute top-full left-1/2 -translate-x-1/2 w-175 bg-white rounded-b-2xl shadow-2xl shadow-black/8 border border-obsidian-100/80 p-8 z-50"
                     >
                       <div className="grid grid-cols-3 gap-6">
-                        {/* Category Links */}
                         <div className="col-span-2">
                           <p className="text-[10px] font-semibold tracking-[0.2em] uppercase text-obsidian-400 mb-4">
                             Shop by Category
@@ -208,23 +213,24 @@ export default function Navbar() {
                                 </Link>
                                 {cat.subcategories.length > 0 && (
                                   <div className="ml-3 mb-2">
-                                    {cat.subcategories.slice(0, 3).map((sub) => (
-                                      <Link
-                                        key={sub}
-                                        href={`/category/${cat.slug}?sub=${encodeURIComponent(sub)}`}
-                                        className="block py-0.5 text-xs text-obsidian-400 hover:text-gold-500 transition-colors"
-                                      >
-                                        {sub}
-                                      </Link>
-                                    ))}
+                                    {cat.subcategories
+                                      .slice(0, 3)
+                                      .map((sub) => (
+                                        <Link
+                                          key={sub}
+                                          href={`/category/${cat.slug}?sub=${encodeURIComponent(sub)}`}
+                                          className="block py-0.5 text-xs text-obsidian-400 hover:text-gold-500 transition-colors"
+                                        >
+                                          {sub}
+                                        </Link>
+                                      ))}
                                   </div>
                                 )}
                               </div>
                             ))}
                           </div>
                         </div>
-                        {/* Featured CTA */}
-                        <div className="relative rounded-xl overflow-hidden bg-obsidian-950 p-5 flex flex-col justify-end min-h-[200px]">
+                        <div className="relative rounded-xl overflow-hidden bg-obsidian-950 p-5 flex flex-col justify-end min-h-50">
                           <div className="absolute inset-0 bg-linear-to-t from-obsidian-950/90 to-obsidian-950/30 z-10" />
                           <div className="relative z-20">
                             <p className="text-gold-400 text-[10px] tracking-[0.2em] uppercase font-semibold mb-1">
@@ -242,7 +248,6 @@ export default function Navbar() {
                           </div>
                         </div>
                       </div>
-                      {/* Bottom links */}
                       <div className="mt-6 pt-4 border-t border-obsidian-100 flex items-center justify-between">
                         <Link
                           href="/products"
@@ -272,11 +277,11 @@ export default function Navbar() {
             </div>
 
             {/* ── Right Actions ── */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5 sm:gap-1">
               {/* Search */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="p-2.5 text-obsidian-600 hover:text-gold-600 transition-colors"
+                className="flex items-center justify-center w-11 h-11 text-obsidian-600 hover:text-gold-600 transition-colors touch-manipulation active:bg-obsidian-50 rounded-xl"
                 aria-label="Search"
               >
                 <Search className="w-5 h-5" />
@@ -296,13 +301,8 @@ export default function Navbar() {
         </nav>
 
         {/* ── Gold accent line ── */}
-        <motion.div
-          className="h-[1px] bg-linear-to-r from-transparent via-gold-300/40 to-transparent"
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-        />
-      </motion.header>
+        <div className="h-px bg-linear-to-r from-transparent via-gold-300/40 to-transparent" />
+      </header>
 
       {/* ── Search Overlay ── */}
       <AnimatePresence>
@@ -311,7 +311,7 @@ export default function Navbar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] bg-obsidian-950/60 backdrop-blur-sm"
+            className="fixed inset-0 z-60 bg-obsidian-950/60 backdrop-blur-sm"
             onClick={() => setSearchOpen(false)}
           >
             <motion.div
@@ -319,47 +319,54 @@ export default function Navbar() {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -40, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="bg-white shadow-2xl"
+              className="bg-white shadow-2xl safe-area-top"
               onClick={(e) => e.stopPropagation()}
             >
-              <form onSubmit={handleSearch} className="max-w-3xl mx-auto px-6 py-8">
+              <form
+                onSubmit={handleSearch}
+                className="max-w-3xl mx-auto px-5 sm:px-6 py-5 sm:py-8"
+              >
                 <label className="text-[10px] tracking-[0.2em] uppercase text-obsidian-400 font-semibold mb-3 block">
                   What are you looking for?
                 </label>
                 <div className="flex items-center gap-3 border-b-2 border-obsidian-200 focus-within:border-gold-400 transition-colors pb-2">
-                  <Search className="w-5 h-5 text-obsidian-400" />
+                  <Search className="w-5 h-5 text-obsidian-400 shrink-0" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search rings, necklaces, diamonds..."
-                    className="flex-1 text-lg font-display text-obsidian-900 placeholder:text-obsidian-300 outline-none bg-transparent"
+                    className="flex-1 text-base sm:text-lg font-display text-obsidian-900 placeholder:text-obsidian-300 outline-none bg-transparent"
                     autoFocus
                   />
                   <button
                     type="button"
                     onClick={() => setSearchOpen(false)}
-                    className="p-1 text-obsidian-400 hover:text-obsidian-700"
+                    className="p-2 text-obsidian-400 hover:text-obsidian-700 touch-manipulation"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {["Diamond Rings", "Gold Necklaces", "Earrings", "Bracelets", "Wedding"].map(
-                    (term) => (
-                      <button
-                        key={term}
-                        type="button"
-                        onClick={() => {
-                          setSearchQuery(term);
-                          window.location.href = `/products?search=${encodeURIComponent(term)}`;
-                        }}
-                        className="px-3 py-1 text-xs font-medium text-obsidian-500 bg-obsidian-50 rounded-full hover:bg-gold-50 hover:text-gold-700 transition-colors"
-                      >
-                        {term}
-                      </button>
-                    )
-                  )}
+                  {[
+                    "Diamond Rings",
+                    "Gold Necklaces",
+                    "Earrings",
+                    "Bracelets",
+                    "Wedding",
+                  ].map((term) => (
+                    <button
+                      key={term}
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery(term);
+                        window.location.href = `/products?search=${encodeURIComponent(term)}`;
+                      }}
+                      className="px-3 py-1.5 text-xs font-medium text-obsidian-500 bg-obsidian-50 rounded-full hover:bg-gold-50 hover:text-gold-700 transition-colors touch-manipulation"
+                    >
+                      {term}
+                    </button>
+                  ))}
                 </div>
               </form>
             </motion.div>
@@ -367,7 +374,7 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      {/* ── Mobile Menu ── */}
+      {/* ── Mobile Menu (slide-in drawer) ── */}
       <AnimatePresence>
         {mobileOpen && (
           <>
@@ -375,7 +382,7 @@ export default function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[55] bg-obsidian-950/40 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-55 bg-obsidian-950/40 backdrop-blur-sm lg:hidden"
               onClick={() => setMobileOpen(false)}
             />
             <motion.div
@@ -383,12 +390,16 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 280 }}
-              className="fixed top-0 left-0 bottom-0 w-[85%] max-w-sm bg-white z-[56] lg:hidden overflow-y-auto"
+              className="fixed top-0 left-0 bottom-0 w-[85%] max-w-sm bg-white z-56 lg:hidden overflow-y-auto overscroll-contain"
             >
-              <div className="p-6">
-                {/* Mobile Logo */}
-                <div className="flex items-center justify-between mb-8">
-                  <Link href="/" className="flex items-center gap-2">
+              <div className="p-5 sm:p-6">
+                {/* Mobile Logo + Close */}
+                <div className="flex items-center justify-between mb-6">
+                  <Link
+                    href="/"
+                    className="flex items-center gap-2"
+                    onClick={() => setMobileOpen(false)}
+                  >
                     <Diamond className="w-6 h-6 text-gold-500" />
                     <span className="font-display text-xl font-bold text-obsidian-950">
                       Lumière
@@ -396,23 +407,26 @@ export default function Navbar() {
                   </Link>
                   <button
                     onClick={() => setMobileOpen(false)}
-                    className="p-2 text-obsidian-600"
+                    className="flex items-center justify-center w-11 h-11 text-obsidian-600 touch-manipulation active:bg-obsidian-50 rounded-xl"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
 
-                {/* Mobile Nav Links */}
-                <div className="space-y-1">
+                {/* Mobile Nav Links — larger touch targets */}
+                <div className="space-y-0.5">
                   <MobileNavLink href="/" active={pathname === "/"}>
                     Home
                   </MobileNavLink>
-                  <MobileNavLink href="/products" active={pathname === "/products"}>
+                  <MobileNavLink
+                    href="/products"
+                    active={pathname === "/products"}
+                  >
                     All Products
                   </MobileNavLink>
 
                   {/* Categories */}
-                  <p className="text-[10px] tracking-[0.2em] uppercase text-obsidian-400 font-semibold pt-5 pb-2 px-3">
+                  <p className="text-[10px] tracking-[0.2em] uppercase text-obsidian-400 font-semibold pt-5 pb-1.5 px-3">
                     Categories
                   </p>
                   {categories.map((cat) => (
@@ -425,31 +439,37 @@ export default function Navbar() {
                     </MobileNavLink>
                   ))}
 
-                  <div className="divider-gold my-6" />
+                  <div className="divider-gold my-5" />
 
                   <MobileNavLink href="/products?sort=newest" active={false}>
                     New Arrivals
                   </MobileNavLink>
-                  <MobileNavLink href="/products?isFeatured=true" active={false}>
+                  <MobileNavLink
+                    href="/products?isFeatured=true"
+                    active={false}
+                  >
                     Bestsellers
                   </MobileNavLink>
                 </div>
 
                 {/* Mobile CTA */}
-                <div className="mt-8">
+                <div className="mt-6">
                   <a
                     href="https://wa.me/919876543210"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-luxury-filled w-full text-center text-xs"
+                    className="btn-luxury-filled w-full text-center text-xs rounded-xl"
                   >
                     Enquire on WhatsApp
                   </a>
                 </div>
 
-                {/* Contact Info */}
-                <div className="mt-8 space-y-2 text-xs text-obsidian-500">
-                  <a href="tel:+919876543210" className="flex items-center gap-2">
+                {/* Contact */}
+                <div className="mt-6 space-y-2.5 text-xs text-obsidian-500">
+                  <a
+                    href="tel:+919876543210"
+                    className="flex items-center gap-2 py-1 touch-manipulation"
+                  >
                     <Phone className="w-3.5 h-3.5" /> +91 98765 43210
                   </a>
                   <p className="flex items-center gap-2">
@@ -461,6 +481,40 @@ export default function Navbar() {
           </>
         )}
       </AnimatePresence>
+
+      {/* ══════════════════════════════════════════════════
+         MOBILE BOTTOM NAV — fixed, always visible on mobile
+         Fast thumb-friendly navigation
+         ══════════════════════════════════════════════════ */}
+      <div className="fixed bottom-0 left-0 right-0 z-45 lg:hidden bg-white/95 backdrop-blur-lg border-t border-obsidian-100 safe-area-bottom">
+        <div className="grid grid-cols-4 h-14">
+          <BottomNavItem
+            href="/"
+            icon={Home}
+            label="Home"
+            active={pathname === "/"}
+          />
+          <BottomNavItem
+            href="/products"
+            icon={ShoppingBag}
+            label="Shop"
+            active={
+              pathname === "/products" || pathname.startsWith("/category")
+            }
+          />
+          <BottomNavItem
+            href="/products?sort=newest"
+            icon={Grid3X3}
+            label="New In"
+            active={false}
+          />
+          <BottomNavLink
+            href="https://wa.me/919876543210?text=Hi%2C%20I%27m%20interested%20in%20your%20jewelry%20collection"
+            icon={MessageCircle}
+            label="Enquire"
+          />
+        </div>
+      </div>
     </>
   );
 }
@@ -480,14 +534,12 @@ function NavLink({
     <Link
       href={href}
       className={`px-4 py-2 text-sm font-medium tracking-wide transition-colors relative ${
-        active
-          ? "text-gold-600"
-          : "text-obsidian-700 hover:text-gold-600"
+        active ? "text-gold-600" : "text-obsidian-700 hover:text-gold-600"
       }`}
     >
       {children}
       {active && (
-        <span className="absolute bottom-0 left-4 right-4 h-[2px] bg-gold-500 rounded-full" />
+        <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-gold-500 rounded-full" />
       )}
     </Link>
   );
@@ -505,13 +557,57 @@ function MobileNavLink({
   return (
     <Link
       href={href}
-      className={`block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-        active
-          ? "bg-gold-50 text-gold-700"
-          : "text-obsidian-700 hover:bg-obsidian-50"
+      className={`block px-3 py-3 rounded-xl text-sm font-medium transition-colors touch-manipulation active:bg-obsidian-50 ${
+        active ? "bg-gold-50 text-gold-700" : "text-obsidian-700"
       }`}
     >
       {children}
     </Link>
+  );
+}
+
+function BottomNavItem({
+  href,
+  icon: Icon,
+  label,
+  active,
+}: {
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  active: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`flex flex-col items-center justify-center gap-0.5 touch-manipulation active:scale-95 transition-transform ${
+        active ? "text-gold-600" : "text-obsidian-400"
+      }`}
+    >
+      <Icon className="w-5 h-5" />
+      <span className="text-[10px] font-medium">{label}</span>
+    </Link>
+  );
+}
+
+function BottomNavLink({
+  href,
+  icon: Icon,
+  label,
+}: {
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex flex-col items-center justify-center gap-0.5 touch-manipulation active:scale-95 transition-transform text-gold-600"
+    >
+      <Icon className="w-5 h-5" />
+      <span className="text-[10px] font-medium">{label}</span>
+    </a>
   );
 }

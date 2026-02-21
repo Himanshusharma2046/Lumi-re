@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import AdminSidebar from "@/components/admin/Sidebar";
-import AdminTopbar from "@/components/admin/Topbar";
+import AdminLayoutClient from "@/components/admin/AdminLayoutClient";
 import AuthProvider from "@/components/providers/AuthProvider";
 
 export const metadata: Metadata = {
@@ -21,15 +20,7 @@ export default function AdminLayout({
 }) {
   return (
     <AuthProvider>
-      <div className="min-h-screen bg-slate-50">
-        <AdminSidebar />
-
-        {/* Main content — offset by sidebar width */}
-        <div className="ml-18 lg:ml-64 transition-all duration-300 flex flex-col min-h-screen">
-          <AdminTopbar />
-          <main className="flex-1 p-6">{children}</main>
-        </div>
-      </div>
+      <AdminLayoutClient>{children}</AdminLayoutClient>
     </AuthProvider>
   );
 }

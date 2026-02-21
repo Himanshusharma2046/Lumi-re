@@ -99,7 +99,7 @@ export default function CategoryPageClient({
         <div className="absolute inset-0 bg-linear-to-b from-obsidian-950/60 to-obsidian-950/90" />
         <div className="grain-overlay absolute inset-0" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-14 lg:py-20">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-14 lg:py-20">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -142,13 +142,13 @@ export default function CategoryPageClient({
       <div className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
         {/* ── Subcategory Filter Pills ── */}
         {category.subcategories?.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1 mb-6">
             <button
               onClick={() => setActiveSub("")}
-              className={`px-4 py-2 rounded-full text-xs font-medium border transition-all ${
+              className={`px-4 py-2.5 sm:py-2 rounded-full text-xs font-medium border transition-all shrink-0 touch-manipulation ${
                 activeSub === ""
                   ? "border-gold-500 bg-gold-50 text-gold-800"
-                  : "border-obsidian-200 text-obsidian-600 hover:border-gold-300"
+                  : "border-obsidian-200 text-obsidian-600 hover:border-gold-300 active:bg-obsidian-50"
               }`}
             >
               All {category.name}
@@ -157,10 +157,10 @@ export default function CategoryPageClient({
               <button
                 key={sub}
                 onClick={() => setActiveSub(activeSub === sub ? "" : sub)}
-                className={`px-4 py-2 rounded-full text-xs font-medium border transition-all ${
+                className={`px-4 py-2.5 sm:py-2 rounded-full text-xs font-medium border transition-all shrink-0 touch-manipulation whitespace-nowrap ${
                   activeSub === sub
                     ? "border-gold-500 bg-gold-50 text-gold-800"
-                    : "border-obsidian-200 text-obsidian-600 hover:border-gold-300"
+                    : "border-obsidian-200 text-obsidian-600 hover:border-gold-300 active:bg-obsidian-50"
                 }`}
               >
                 {sub}
